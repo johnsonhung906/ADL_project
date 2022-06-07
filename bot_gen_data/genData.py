@@ -72,8 +72,8 @@ def main(args):
     statistics = []
     f1 = open(f"{args.file_split}_1.jsonl", "w+")
     f2 = open(f"{args.file_split}_2.jsonl", "w+")
-    f3 = open(f"{args.file_split}_3.josnl", "w+")
-    f4 = open(f"{args.file_split}_4.josnl", "w+")
+    f3 = open(f"{args.file_split}_3.jsonl", "w+")
+    f4 = open(f"{args.file_split}_4.jsonl", "w+")
     
     for d in tqdm(dialog):
         # start with the second utterance from the simulator
