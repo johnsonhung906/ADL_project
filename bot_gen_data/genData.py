@@ -27,14 +27,16 @@ def save_data(dialog, index, file, mode):
             data['query'] = dialog[f_idx: i]
             data['answer'] = dialog[i]
             line = json.dumps(data) + '\n'
+            assert(len(data['query']) <= 4 and len(data['query']) > 0)
             file.write(line)
     elif mode == 4:
         f_idx = 0 if index-4 < 0 else index-4
-        for i in range(index-4, index-1):
+        for i in range(f_idx, index):
             data = {}
             data['query'] = dialog[i: index]
             data['answer'] = dialog[index]
             line = json.dumps(data) + '\n'
+            assert(len(data['query']) <= 4 and len(data['query']) > 0)
             file.write(line)
 
 
@@ -43,7 +45,7 @@ def parse_args():
 
     parser.add_argument(
         "--file_split",
-        default="eval",
+        default="train",
         type=str
     )
     args = parser.parse_args()
