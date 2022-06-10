@@ -48,6 +48,31 @@ def parse_args():
         help="whether output the dialogs to the command line",
     )
 
+    parser.add_argument(
+        "--max_length",
+        default=30,
+        type=int
+    )
+    parser.add_argument(
+        "--num_beams",
+        default = None,
+        type=int
+    )
+    parser.add_argument(
+        "--top_p",
+        default = None,
+        type=float
+    )
+    parser.add_argument(
+        "--top_k",
+        default = None,
+        type=int
+    )
+    parser.add_argument(
+        "--temp",
+        default = None,
+        type=float
+    )
     args = parser.parse_args()
 
     return args
@@ -91,7 +116,25 @@ if __name__ == "__main__":
             "previous_utterance",
         ],
     )
-
+    gen_kwargs = {
+        "max_length" : args.max_length,
+        "synced_gpus" : False
+    }
+    if args.top_k is not None or args.top_p is not None or args.temp is not None:
+        gen_kwargs["do_sample"] = True
+    
+    if args.top_k is not None:
+        gen_kwargs["top_k"] = args.top_k
+        
+    if args.top_p is not None:
+        gen_kwargs["top_p"] = args.top_p
+        
+    if args.temp is not None:
+        gen_kwargs["temperature"] = args.temp
+    
+    if args.num_beams is not None:
+        gen_kwargs["num_beams"] = args.num_beams
+        gen_kwargs["early_stopping"] = True
     if args.interactive_mode:
         for _ in range(args.num_chats):
             dialog = ["hi"]
@@ -146,9 +189,10 @@ if __name__ == "__main__":
 
                 # you might need to change this line due to the model you use
                 inputs = bot_tokenizer(
-                    ["</s> <s>".join(dialog[-3:])], return_tensors="pt", truncation=True
+                    # [" ".join(dialog[-4:])], return_tensors="pt", truncation=True
+                    [" ".join(dialog)], return_tensors="pt", truncation=True
                 ).to(device)
-                reply_ids = bot.generate(**inputs)
+                reply_ids = bot.generate(**inputs, **gen_kwargs)
                 text = bot_tokenizer.batch_decode(reply_ids, skip_special_tokens=True)[
                     0
                 ].strip()
